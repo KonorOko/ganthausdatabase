@@ -328,6 +328,11 @@ def main():
                        layout='wide', 
                        initial_sidebar_state="collapsed")
     st.write('<style>div.block-container{padding-top:2rem;}</style>', unsafe_allow_html=True)
+    hide_footer_style = """
+    <style>
+    .reportview-container .main footer {visibility: hidden;}    
+    """
+    st.markdown(hide_footer_style, unsafe_allow_html=True)
     # content
     header = Header("Modificar")
     database = DataBase()
