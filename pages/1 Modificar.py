@@ -13,9 +13,9 @@ class Add:
         self.query_venta = text(
             "INSERT INTO Venta (ID_Factura, Fecha, Total, MontoPagado, Distribucion, ID_Cliente, ID_Empleado) VALUES (:ID_Factura, :Fecha, :Total, :MontoPagado, :Distribucion, :ID_Cliente, :ID_Empleado);")
         self.query_empleado = text(
-            "INSERT INTO Empleado (Nombre, Apellido, Telefono, Correo, Puesto) VALUES (:Nombre, :Apellido, :Telefono, :Correo, :Puesto);")
+            "INSERT INTO Empleado (Nombre, Telefono, Correo, Puesto) VALUES (:Nombre, :Telefono, :Correo, :Puesto);")
         self.query_cliente = text(
-            "INSERT INTO Cliente (Nombre, Apellido, Direccion, Telefono, Correo) VALUES (:Nombre, :Apellido, :Direccion, :Telefono, :Correo)"
+            "INSERT INTO Cliente (Nombre, Telefono, Correo) VALUES (:Nombre, :Direccion, :Telefono, :Correo)"
         )
         self.data_cliente = "SELECT * FROM Cliente"
         self.data_vendedor = "SELECT * FROM Empleado"
@@ -26,13 +26,13 @@ class Add:
             
             # get names of clients
             df_cliente = pd.DataFrame(self.database.get_data(self.data_cliente))
-            nombre_clientes = df_cliente[["Nombre", "Apellido"]].values.tolist()
-            nombre_clientes = [f"{nombre} {apellido}" for nombre, apellido in nombre_clientes]
+            nombre_clientes = df_cliente["Nombre"].values.tolist()
+            nombre_clientes = [f"{nombre}" for nombre in nombre_clientes]
 
             # nombres de vendedores
             df_vendedor = pd.DataFrame(self.database.get_data(self.data_vendedor))
-            nombre_vendedores = df_vendedor[["Nombre", "Apellido"]].values.tolist()
-            nombre_vendedores = [f"{nombre} {apellido}" for nombre, apellido in nombre_vendedores]
+            nombre_vendedores = df_vendedor["Nombre"].values.tolist()
+            nombre_vendedores = [f"{nombre}" for nombre in nombre_vendedores]
             
             spacerfrom1, col1form, spacer2form, col2form, spacerform3 = st.columns([0.01 ,0.485, 0.01, 0.485, 0.01])
             with col1form:
@@ -49,12 +49,11 @@ class Add:
                                                   type="secondary")
             
             if submitted:
-                id_cliente = self.database.get_data("SELECT ID_Cliente From Cliente WHERE :Nombre = Nombre and :Apellido = Apellido", 
-                                                params={"Nombre": nombre_cliente.split()[0], "Apellido": nombre_cliente.split()[1]})
-                id_cliente = pd.DataFrame(id_cliente).iloc[0,0]
-
-                id_empleado = self.database.get_data("SELECT ID_Cliente From Cliente WHERE :Nombre = Nombre and :Apellido = Apellido",
-                                                     params= {"Nombre": nombre_vendedor.split()[0], "Apellido": nombre_vendedor.split()[1]})
+                id_cliente = self.database.get_data("SELECT ID_Cliente From Cliente WHERE :Nombre = Nombre", 
+                                                params={"Nombre": nombre_cliente})
+                id_cliente = pd.DataFrame(id_cliente)
+                id_empleado = self.database.get_data("SELECT ID_Cliente From Cliente WHERE :Nombre = Nombre",
+                                                     params= {"Nombre": nombre_vendedor})
                 info = {"ID_Factura": numero_de_factura, "Fecha": fecha, "Total": total, "MontoPagado": pagado,
                          "ID_Cliente": id_cliente, "ID_Empleado": 1}
                 try:
@@ -75,12 +74,11 @@ class Add:
                                        placeholder="Puesto que ocupa en la empresa", index= None)
 
             with col2form:
-                apellido_empleado = st.text_input("Apellido", placeholder="Apellido de empleado")
                 correo = st.text_input("Correo", placeholder="Correo electrónico")
                 submitted = st.form_submit_button("Agregar", use_container_width=True)
             
             if submitted:
-                info = {"Nombre": nombre_empleado, "Apellido": apellido_empleado, 
+                info = {"Nombre": nombre_empleado,
                         "Telefono": telefono, "Correo": correo, "Puesto": puesto}
                 try:
                     self.database.insert_data(self.query_empleado, info)
@@ -98,12 +96,11 @@ class Add:
                 direccion = st.text_input("Direccion", placeholder="Dirección de cliente")
                 correo = st.text_input("Correo", placeholder="Correo del cliente")
             with col2form:
-                apellido_cliente = st.text_input("Apellido", placeholder="Apellido de Cliente")
                 telefono = st.text_input("Teléfono", placeholder="Teléfono de cliente")
                 submitted = st.form_submit_button("Agregar", use_container_width= True)
 
             if submitted:
-                info = {"Nombre": nombre_cliente, "Apellido": apellido_cliente,
+                info = {"Nombre": nombre_cliente,
                         "Direccion": direccion, "Telefono": telefono, "Correo": correo}
                 try:
                     self.database.insert_data(self.query_cliente, info)
@@ -192,13 +189,13 @@ class Modify:
         with st.form("Venta", clear_on_submit=True):
             # get names of clients
             df_cliente = pd.DataFrame(self.database.get_data(self.query_cliente))
-            nombre_clientes = df_cliente[["Nombre", "Apellido"]].values.tolist()
+            nombre_clientes = df_cliente["Nombre"].values.tolist()
             nombre_clientes = [f"{nombre} {apellido}" for nombre, apellido in nombre_clientes]
 
             # get names of sellers
             df_vendedor = pd.DataFrame(self.database.get_data(self.query_vendedor))
-            nombre_vendedores = df_vendedor[["Nombre", "Apellido"]].values.tolist()
-            nombre_vendedores = [f"{nombre} {apellido}" for nombre, apellido in nombre_vendedores]
+            nombre_vendedores = df_vendedor["Nombre"].values.tolist()
+            nombre_vendedores = [f"{nombre}" for nombre, apellido in nombre_vendedores]
 
             st.write("Modifica un registro")
             
@@ -218,9 +215,9 @@ class Modify:
                                                   type="secondary")
             
             if submitted:
-                id_cliente = self.database.get_data("SELECT ID_Cliente From Cliente WHERE :Nombre = Nombre and :Apellido = Apellido", 
-                                                params={"Nombre": nombre_cliente.split()[0], "Apellido": nombre_cliente.split()[1]})
-                id_cliente = pd.DataFrame(id_cliente).iloc[0,0]
+                id_cliente = self.database.get_data("SELECT ID_Cliente From Cliente WHERE :Nombre = Nombre", 
+                                                params={"Nombre": nombre_cliente})
+                id_cliente = pd.DataFrame(id_cliente)
                 info = {"Fecha": fecha, "Total": total, "MontoPagado": pagado, "ID_Cliente": id_cliente, "ID_Empleado": 1}
                 try:
                     self.database.insert_data(self.query_venta, info)
@@ -235,7 +232,6 @@ class Modify:
             spacerfrom1, col1form, spacer2form, col2form, spacerform3 = st.columns([0.01 ,0.485, 0.01, 0.485, 0.01])
             with col1form:
                 numero_de_empleado = st.text_input("Ingresa el ID del empleado", placeholder="ID del empleado")
-                apellido = st.text_input("Apellido", placeholder="Apellido del empleado")
 
             with col2form:
                 nombre = st.text_input("Nombre", placeholder="Nombre del empleado")
