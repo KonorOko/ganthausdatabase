@@ -19,7 +19,7 @@ class DataBase:
             return self.conn
         except Exception as e:
             print("Connect Failed:", e)
-            st.error("Failed to connect to database")
+            st.error("Failed to connect to database", e)
             return None
 
     def get_data(self, query: str, params: dict = None):
