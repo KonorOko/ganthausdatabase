@@ -11,7 +11,7 @@ class Add:
     def __init__(self, database):
         self.database = database
         self.query_venta = text(
-            "INSERT INTO Venta (Fecha, Total, MontoPagado, ID_Cliente, ID_Empleado) VALUES (:Fecha, :Total, :MontoPagado, :ID_Cliente, :ID_Empleado);")
+            "INSERT INTO Venta (ID_Factura, Fecha, Total, MontoPagado, Distribucion, ID_Cliente, ID_Empleado) VALUES (:ID_Factura, :Fecha, :Total, :MontoPagado, :Distribucion, :ID_Cliente, :ID_Empleado);")
         self.query_empleado = text(
             "INSERT INTO Empleado (Nombre, Apellido, Telefono, Correo, Puesto) VALUES (:Nombre, :Apellido, :Telefono, :Correo, :Puesto);")
         self.query_cliente = text(
@@ -42,7 +42,7 @@ class Add:
                 total = st.number_input("Monto Total", min_value=0, step=1, value=0)
                 distribucion = st.selectbox("Distribucion", ("Directa", "Sub-distribución"), placeholder= "Tipo de distribución", index= None)
             with col2form:
-                vendedor = st.selectbox("Vendedor", (nombre_vendedores), placeholder= "Nombre del vendedor", index= None)
+                nombre_vendedor = st.selectbox("Vendedor", (nombre_vendedores), placeholder= "Nombre del vendedor", index= None)
                 fecha = st.date_input("Fecha de compra", value=None, format="DD/MM/YYYY")
                 pagado = st.number_input("Monto Pagado", min_value=0, step=1, value=0)
                 submitted = st.form_submit_button("Modificar", use_container_width=True, 
@@ -52,7 +52,11 @@ class Add:
                 id_cliente = self.database.get_data("SELECT ID_Cliente From Cliente WHERE :Nombre = Nombre and :Apellido = Apellido", 
                                                 params={"Nombre": nombre_cliente.split()[0], "Apellido": nombre_cliente.split()[1]})
                 id_cliente = pd.DataFrame(id_cliente).iloc[0,0]
-                info = {"Fecha": fecha, "Total": total, "MontoPagado": pagado, "ID_Cliente": id_cliente, "ID_Empleado": 1}
+
+                id_empleado = self.database.get_data("SELECT ID_Cliente From Cliente WHERE :Nombre = Nombre and :Apellido = Apellido",
+                                                     params= {"Nombre": nombre_vendedor.split()[0], "Apellido": nombre_vendedor.split()[1]})
+                info = {"ID_Factura": numero_de_factura, "Fecha": fecha, "Total": total, "MontoPagado": pagado,
+                         "ID_Cliente": id_cliente, "ID_Empleado": 1}
                 try:
                     self.database.insert_data(self.query_venta, info)
                     st.toast("Venta agregada con éxito")
