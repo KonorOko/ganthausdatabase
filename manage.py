@@ -29,7 +29,7 @@ class DataBase:
             return data
         except Exception as e:
             print(e)
-            st.error("Failed to get data")
+            st.error("Failed to get data", e)
             return None
     
     def insert_data(self, query, data):
