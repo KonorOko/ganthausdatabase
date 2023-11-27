@@ -3,6 +3,5 @@ numpy
 pandas
 pydeck
 streamlit
-SQLAlchemy
-sqlalchemy
 mysqlclient
+SQLAlchemy
