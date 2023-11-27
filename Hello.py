@@ -19,6 +19,7 @@ class Content:
     def builder(self):
         st.title(self.title)
         st.text("Aquí podrás ver los datos de la base de datos.")
+        st.text(st.secrets.connections.mydb.username)
         
         option_data = st.selectbox("Seleccionar datos", ("Empleados", "Ventas"))
         if option_data == "Empleados":

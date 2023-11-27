@@ -10,6 +10,11 @@ class DataBase:
         # connect to database
         try:
             self.conn = st.connection("mydb", type="sql", autocommit=False, ttl=10,
+                                      dialect = st.secrets.connections.mydb.dialect,
+                                      username= st.secrets.connections.mydb.username,
+                                      password = st.secrets.connections.mydb.password,
+                                      host = st.secrets.connections.mydb.host,
+                                      database = st.secrets.connections.mydb.database,
                                       connect_args=ssl_args)
             return self.conn
         except Exception as e:
