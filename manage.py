@@ -9,7 +9,7 @@ class DataBase:
     def connect(self):
         # connect to database
         try:
-            self.conn = st.connection("mydb", type="sql", autocommit=False, ttl=10,
+            self.conn = st.connection("mydb", type="sql", autocommit=False,
                                       dialect = st.secrets.connections.mydb.dialect,
                                       username= st.secrets.connections.mydb.username,
                                       password = st.secrets.connections.mydb.password,
