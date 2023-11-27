@@ -327,7 +327,7 @@ def main():
     st.set_page_config(page_title="Add to DB", 
                        layout='wide', 
                        initial_sidebar_state="collapsed")
-    
+    st.write('<style>div.block-container{padding-top:2rem;}</style>', unsafe_allow_html=True)
     # content
     header = Header("Modificar")
     database = DataBase()
