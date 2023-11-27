@@ -13,22 +13,24 @@ class Add:
         self.query_venta = text(
             "INSERT INTO Venta (Fecha, Total, MontoPagado, ID_Cliente, ID_Empleado) VALUES (:Fecha, :Total, :MontoPagado, :ID_Cliente, :ID_Empleado);")
         self.query_empleado = text(
-            "INSERT INTO Empleado (Nombre, Apellido, Telefono, Correo, Puesto) VALUES (:Nombre, :Apellido, :Telefono, :Correo, :Puesto);"
+            "INSERT INTO Empleado (Nombre, Apellido, Telefono, Correo, Puesto) VALUES (:Nombre, :Apellido, :Telefono, :Correo, :Puesto);")
+        self.query_cliente = text(
+            "INSERT INTO Cliente (Nombre, Apellido, Direccion, Telefono, Correo) VALUES (:Nombre, :Apellido, :Direccion, :Telefono, :Correo)"
         )
-        self.query_cliente = "SELECT * FROM Cliente"
-        self.query_vendedor = "SELECT * FROM Empleado WHERE Puesto = 'Vendedor'"
+        self.data_cliente = "SELECT * FROM Cliente"
+        self.data_vendedor = "SELECT * FROM Empleado WHERE Puesto = 'Vendedor'"
         
     def venta(self):
         with st.form("Agregar_venta", clear_on_submit=True):
             st.write("Agrega informacion a la base de datos")
             
             # get names of clients
-            df_cliente = pd.DataFrame(self.database.get_data(self.query_cliente))
+            df_cliente = pd.DataFrame(self.database.get_data(self.data_cliente))
             nombre_clientes = df_cliente[["Nombre", "Apellido"]].values.tolist()
             nombre_clientes = [f"{nombre} {apellido}" for nombre, apellido in nombre_clientes]
 
             # nombres de vendedores
-            df_vendedor = pd.DataFrame(self.database.get_data(self.query_vendedor))
+            df_vendedor = pd.DataFrame(self.database.get_data(self.data_vendedor))
             nombre_vendedores = df_vendedor[["Nombre", "Apellido"]].values.tolist()
             nombre_vendedores = [f"{nombre} {apellido}" for nombre, apellido in nombre_vendedores]
             
@@ -65,7 +67,7 @@ class Add:
             with col1form:
                 nombre_empleado = st.text_input("Nombre", placeholder="Nombre de empleado")
                 telefono = st.text_input("Telefono", placeholder="Número telefónico")
-                puesto = st.selectbox("Puesto", ("Gerente", "Vendedor", "Repartidor", "Administración"),
+                puesto = st.selectbox("Puesto", ("Gerente de ventas", "Vendedor", "Repartidor", "Administración"),
                                        placeholder="Puesto que ocupa en la empresa", index= None)
 
             with col2form:
@@ -83,6 +85,28 @@ class Add:
                 except Exception as e:
                     st.toast("No se pudo agregar la venta")
 
+    def cliente(self):
+        with st.form("Agregar cliente", clear_on_submit=True):
+            st.write("Agregar informacion a la base de datos")
+            spacerfrom1, col1form, spacer2form, col2form, spacerform3 = st.columns([0.01 ,0.485, 0.01, 0.485, 0.01])
+            with col1form:
+                nombre_cliente = st.text_input("Nombre", placeholder="Nombre de cliente")
+                direccion = st.text_input("Direccion", placeholder="Dirección de cliente")
+                correo = st.text_input("Correo", placeholder="Correo del cliente")
+            with col2form:
+                apellido_cliente = st.text_input("Apellido", placeholder="Apellido de Cliente")
+                telefono = st.text_input("Teléfono", placeholder="Teléfono de cliente")
+                submitted = st.form_submit_button("Agregar", use_container_width= True)
+
+            if submitted:
+                info = {"Nombre": nombre_cliente, "Apellido": apellido_cliente,
+                        "Direccion": direccion, "Telefono": telefono, "Correo": correo}
+                try:
+                    self.database.insert_data(self.query_cliente, info)
+                    st.toast("Cliente agregado con exito")
+                except Exception as e:
+                    st.toast("No se pudo agregar al cliente")
+                    
 
 class Delete:
     def __init__(self, database: DataBase):
@@ -91,6 +115,8 @@ class Delete:
             "DELETE FROM Venta WHERE ID_Venta = :ID_Venta;")
         self.query_empleado = text(
             "DELETE FROM Empleado Where ID_Empleado = :ID_Empleado;")
+        self.query_cliente = text(
+            "DELETE FROM Cliente WHERE ID_Cliente = :ID_Cliente;")
         
     def venta(self):
         with st.form("Venta"):
@@ -116,7 +142,7 @@ class Delete:
             st.write("Elimina un registro de la base de datos")
             spacerfrom1, col1form, spacer2form, col2form, spacerform3 = st.columns([0.01 ,0.485, 0.01, 0.485, 0.01])
             with col1form:
-                numero_de_empleado = st.text_input("Ingresa el ID del empleado")
+                numero_de_empleado = st.text_input("Ingresa ID del empleado")
 
             with col2form:
                 submitted_empleado = st.form_submit_button("Eliminar")
@@ -127,8 +153,29 @@ class Delete:
                     self.database.delete_data(self.query_empleado, params={
                         "ID_Empleado": numero_de_empleado
                     })
+                    st.toast("El empleado ha sido eliminado")
                 except Exception as e:
                     st.toast("No se pudo eliminar el empleado")
+
+    def cliente(self):
+        with st.form("Cliente"):
+            st.write("Elimina a un cliente de la base de datos")
+            spacerfrom1, col1form, spacer2form, col2form, spacerform3 = st.columns([0.01 ,0.485, 0.01, 0.485, 0.01])
+            with col1form:
+                numero_de_cliente = st.text_input("Ingresa ID del cliente")
+
+            with col2form:
+                submitted_cliente = st.form_submit_button("Eliminar")
+
+            if submitted_cliente:
+                try:
+                    numero_de_cliente = int(numero_de_cliente)
+                    self.database.delete_data(self.query_cliente, params={
+                        "ID_Cliente": numero_de_cliente
+                    })
+                    st.toast("El cliente ha sido eliminado")
+                except:
+                    st.toast("No se pudo eliminar el cliente")
 
 
 class Modify:
@@ -214,7 +261,7 @@ class Content:
                  ("Agregar", "Modificar", "Eliminar"), 
                  horizontal=True, index=0)
         
-        tab_venta, tab_empleado = st.tabs(["Ventas", "Empleados"])
+        tab_venta, tab_cliente, tab_empleado = st.tabs(["Ventas", "Cliente", "Empleados"])
         with tab_venta:
             col1, spacer1, col2, spacer2 = st.columns([0.6, 0.01, 0.38, 0.01])
             with col1:
@@ -237,6 +284,21 @@ class Content:
                 if reload:
                     st.cache_data.clear()
 
+        with tab_cliente:
+            col1, spacer1, col2, spacer2 = st.columns([0.6, 0.01, 0.38, 0.01])
+            with col1:
+                if option == "Agregar":
+                    agregar.cliente()
+                elif option == "Modificar":
+                    pass
+                elif option == "Eliminar":
+                    eliminar.cliente()
+            with col2:
+                reload2 = st.button(":arrows_counterclockwise:", use_container_width=True, key="reload2")
+                st.dataframe(self.database.get_data("SELECT * FROM Cliente"), use_container_width=True, hide_index=True)
+                if reload2:
+                    st.cache_data.clear()        
+
         with tab_empleado:
             col1, spacer1, col2, spacer2 = st.columns([0.6, 0.01, 0.38, 0.01])
             with col1:
@@ -250,14 +312,14 @@ class Content:
                     eliminar.empleado()
 
             with col2:
-                reload2 = st.button(":arrows_counterclockwise:", use_container_width=True, key="reload2")
+                reload3 = st.button(":arrows_counterclockwise:", use_container_width=True, key="reload3")
                 st.dataframe(self.database.get_data("SELECT * FROM Empleado"), use_container_width=True, hide_index=True)
-                if reload2:
+                if reload3:
                     st.cache_data.clear()
 
 
 def main():
-    # settings
+    # settings eduardomg8618@gmail.com
     st.set_page_config(page_title="Add to DB", 
                        layout='wide', 
                        initial_sidebar_state="collapsed")
