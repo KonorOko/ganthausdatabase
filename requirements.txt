@@ -4,4 +4,4 @@ pandas
 pydeck
 streamlit
 SQLAlchemy
-mysql-connector-python
+mysqlclient
