@@ -1,6 +1,6 @@
 import streamlit as st
 
-ssl_args = {'ssl': {'ca': f'/workspaces/ganthausdatabase/cacert.pem'}}
+ssl_args = {'ssl': {'ca': '/workspaces/ganthausdatabase/cacert.pem'}}
 
 class DataBase:
     def __init__(self):
