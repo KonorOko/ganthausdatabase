@@ -18,11 +18,11 @@ class Add:
             "INSERT INTO Cliente (Nombre, Apellido, Direccion, Telefono, Correo) VALUES (:Nombre, :Apellido, :Direccion, :Telefono, :Correo)"
         )
         self.data_cliente = "SELECT * FROM Cliente"
-        self.data_vendedor = "SELECT * FROM Empleado WHERE Puesto = 'Vendedor'"
+        self.data_vendedor = "SELECT * FROM Empleado"
         
     def venta(self):
         with st.form("Agregar_venta", clear_on_submit=True):
-            st.write("Agrega informacion a la base de datos")
+            st.write("Agrega información a la base de datos")
             
             # get names of clients
             df_cliente = pd.DataFrame(self.database.get_data(self.data_cliente))
@@ -40,7 +40,7 @@ class Add:
                 nombre_cliente = st.selectbox("Cliente", (nombre_clientes), index=None, 
                                               placeholder="Seleccione un cliente")
                 total = st.number_input("Monto Total", min_value=0, step=1, value=0)
-                distribucion = st.selectbox("Distribucion", ("Directa", "Sub-distribución"), placeholder= "Tipo de distribución", index= None)
+                distribucion = st.selectbox("Distribución", ("Directa", "Sub-distribución"), placeholder= "Tipo de distribución", index= None)
             with col2form:
                 nombre_vendedor = st.selectbox("Vendedor", (nombre_vendedores), placeholder= "Nombre del vendedor", index= None)
                 fecha = st.date_input("Fecha de compra", value=None, format="DD/MM/YYYY")
@@ -66,7 +66,7 @@ class Add:
 
     def empleado(self):
         with st.form("Agregar_empleado", clear_on_submit= True):
-            st.write("Agregar informacion a la base de datos")
+            st.write("Agregar información a la base de datos")
             spacerfrom1, col1form, spacer2form, col2form, spacerform3 = st.columns([0.01 ,0.485, 0.01, 0.485, 0.01])
             with col1form:
                 nombre_empleado = st.text_input("Nombre", placeholder="Nombre de empleado")
@@ -91,7 +91,7 @@ class Add:
 
     def cliente(self):
         with st.form("Agregar cliente", clear_on_submit=True):
-            st.write("Agregar informacion a la base de datos")
+            st.write("Agregar información a la base de datos")
             spacerfrom1, col1form, spacer2form, col2form, spacerform3 = st.columns([0.01 ,0.485, 0.01, 0.485, 0.01])
             with col1form:
                 nombre_cliente = st.text_input("Nombre", placeholder="Nombre de cliente")
@@ -107,7 +107,7 @@ class Add:
                         "Direccion": direccion, "Telefono": telefono, "Correo": correo}
                 try:
                     self.database.insert_data(self.query_cliente, info)
-                    st.toast("Cliente agregado con exito")
+                    st.toast("Cliente agregado con éxito")
                 except Exception as e:
                     st.toast("No se pudo agregar al cliente")
                     
@@ -261,7 +261,7 @@ class Content:
     def builder(self):
         st.header(self.title)
         st.text("Aquí podrás agregar datos a la base de datos.")
-        option = st.radio("Selecciona la modificacion que quieras hacer", 
+        option = st.radio("Selecciona la modificación que quieras hacer", 
                  ("Agregar", "Modificar", "Eliminar"), 
                  horizontal=True, index=0)
         
