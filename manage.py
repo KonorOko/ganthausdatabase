@@ -54,9 +54,18 @@ class DataBase:
         # update data in database
         pass
         
-    def delete_data(self, data):
+    def delete_data(self, query, params: dict = None):
         # delete data from database
-        pass
+        with self.conn.session as session:
+            try:
+                session.execute(query, params)
+                session.commit()
+                return 0
+            except Exception as e:
+                session.rollback()
+                print("Delete data failed: ", e)
+                st.error("Failed to delete data")
+                raise
         
     def close(self):
         # close database connection

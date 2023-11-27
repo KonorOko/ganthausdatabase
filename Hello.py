@@ -42,7 +42,7 @@ class Content:
                     count = df.shape[0]
                 
             elif option_data == "Ventas":
-                opciones = st.multiselect("Filtros", df["Fecha"].unique(), label_visibility="collapsed")
+                opciones = st.multiselect("Filtros", ["Pagado", "Por pagar"], label_visibility="collapsed")
                 min_time = st.date_input("Mínimo", value=None, key= "min", format="DD/MM/YYYY")
                 max_time = st.date_input("Máximo", value=None, key= "max", format="DD/MM/YYYY")
                 
